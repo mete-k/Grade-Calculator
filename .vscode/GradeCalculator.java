@@ -21,40 +21,42 @@ public class GradeCalculator extends JFrame {
 
     public Course courseSelectionMenu() {
         coursePanel = new JPanel();
-        coursePanel.setLayout(new BorderLayout()); 
+        coursePanel.setLayout(new BorderLayout());
+    
         JLabel label = new JLabel("Select a course:", SwingConstants.CENTER);
+        label.setFont(new Font("Arial", Font.BOLD, 20));
+        coursePanel.add(label, BorderLayout.NORTH);
+    
         ArrayList<JRadioButton> radioButtons = new ArrayList<>();
         ButtonGroup group = new ButtonGroup();
-    
         JButton continueButton = new JButton("Continue");
         continueButton.setEnabled(false);
-        continueButton.setSize(new Dimension(50,10));
+    
+        JPanel radioPanel = new JPanel();
+        radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.Y_AXIS));
     
         for (Course course : courses) {
             JRadioButton rb = new JRadioButton(course.getCourseName());
             radioButtons.add(rb);
             group.add(rb);
-            coursePanel.add(rb);
+            radioPanel.add(rb);
     
-            rb.addActionListener(e -> {
-                continueButton.setEnabled(true);
-            });
+            rb.addActionListener(_ -> continueButton.setEnabled(true));
         }
     
-        continueButton.addActionListener(e -> {
+        coursePanel.add(radioPanel, BorderLayout.CENTER);
+        coursePanel.add(continueButton, BorderLayout.SOUTH);
+    
+        continueButton.addActionListener(_ -> {
             for (JRadioButton rb : radioButtons) {
                 if (rb.isSelected()) {
-                    String selectedCourse = rb.getText();
-                    selected = getCourseByName(selectedCourse);
+                    selected = getCourseByName(rb.getText());
                     break;
                 }
             }
-    
             JOptionPane.showMessageDialog(this, "You selected: " + selected.getCourseName());
         });
-        
-        coursePanel.add(label, BorderLayout.NORTH);
-        coursePanel.add(continueButton, BorderLayout.SOUTH);
+    
         this.add(coursePanel);
         return selected;
     }    
@@ -62,6 +64,10 @@ public class GradeCalculator extends JFrame {
     public void initializeCourses() {
         courses = new ArrayList<>();
         courses.add(new Math102());
+        courses.add(new Math132());
+        courses.add(new Cs102());
+        courses.add(new Phys102());
+        courses.add(new Ee102());
     }
 
     public Course getCourseByName(String name) {
@@ -72,6 +78,7 @@ public class GradeCalculator extends JFrame {
         }
         return null;
     }
+
     public static void main(String[] args) {
         new GradeCalculator();
     }
