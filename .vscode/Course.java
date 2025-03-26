@@ -1,10 +1,11 @@
 public class Course {
-    public static String[] letterGrades = {"A ", "A-", "B+", "B ", "C+", "C ", "C-", "D+", "D ", "F "};
+    public String[] letterGrades = {"A ", "A-", "B+", "B ", "C+", "C ", "C-", "D+", "D ", "F "};
     protected String courseName;
-    protected int[] letterGradeNotes;
     protected double[] notes;
     protected double[] weights;
     protected String[] exams;
+    protected boolean isCatalog;
+    protected int[] catalogNotes;
 
     public Course(String courseName) {
         this.courseName = courseName;
@@ -39,5 +40,9 @@ public class Course {
 
     public double[] getWeights() {
         return this.weights;
+    }
+
+    public boolean isCatalog() {
+        return this.isCatalog;
     }
 }
