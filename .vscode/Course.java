@@ -1,3 +1,8 @@
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+
+import javax.swing.JPanel;
+
 public class Course {
     public String[] letterGrades = {"A ", "A-", "B+", "B ", "C+", "C ", "C-", "D+", "D ", "F "};
     protected String courseName;
