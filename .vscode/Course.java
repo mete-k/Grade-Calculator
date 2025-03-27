@@ -1,5 +1,6 @@
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
@@ -11,6 +12,9 @@ public class Course {
     protected String[] exams;
     protected boolean isCatalog;
     protected int[] catalogNotes;
+    protected int length;
+    protected int startFrom;
+    protected int endAt;
 
     public Course(String courseName) {
         this.courseName = courseName;
@@ -25,29 +29,105 @@ public class Course {
     }
 
     public double calculateRequiredFinal(double wantedNote) {
-        double[] tempNotes = notes.clone();
-        tempNotes[4] = 0; 
-        double noteBeforeFinal = calculateAverage(tempNotes);
-        return (wantedNote - noteBeforeFinal) * 100 / weights[4];
+        double noteBeforeFinal = calculateAverage(notes); 
+        return (wantedNote - noteBeforeFinal) * 100 / this.weights[this.length - 1];
+    }      
+
+    public String getLetterGrade(double average) {
+        if (!this.isCatalog) return null;
+        for (int i = 0; i < catalogNotes.length; i++) {
+            if (average >= catalogNotes[i]) {
+                return letterGrades[i];
+            }
+        }
+        return letterGrades[letterGrades.length - 1];
+    }
+
+    protected int[] createCatalog(Course course) {
+        int start = course.startFrom;
+        int end = course.endAt;
+        ArrayList<Integer> catalog = new ArrayList<>();
+        while (start > end) {
+            catalog.add(start);
+            start -= 5; 
+        }
+        return ArrayListToArray(catalog);
+    }
+
+    public int[] ArrayListToArray(ArrayList<Integer> a1) {
+        int[] returnArr = new int[a1.size()];
+        for (int i = 0; i < a1.size(); i++ ) {
+            returnArr[i] = a1.get(i);
+        }
+        return returnArr;
     }
     
-    public String[] getExams() {
-        return this.exams;
+    private void curveCourse() {
     }
+}
+class Math102 extends Course {
 
-    public String getCourseName() {
-        return this.courseName;
+    public Math102() {
+        super("MATH 102");
+        this.isCatalog = true;
+        this.notes = new double[5];
+        this.exams = new String[] {"Midterm 1", "Midterm 2", "Homework", "Quiz", "Final"};
+        this.weights = new double[] {80/3.0, 80/3.0, 10, 10, 80/3.0}; 
+        this.catalogNotes = new int[] {80, 75, 70, 65, 60, 55, 50, 45, 40, 30};
+        this.length = 5;
     }
-    
-    public double[] getNotes() {
-        return this.notes;
-    }
+}
 
-    public double[] getWeights() {
-        return this.weights;
+class Math132 extends Course {
+    public Math132() {
+        super("MATH 132");
+        this.isCatalog = false;
+        this.exams = new String[]{"Midterm 1", "Midterm 2", "Final"};
+        this.notes = new double[3];
+        this.weights = new double[] {33, 33, 34};
+        this.length = 3;
+        this.startFrom = 80;
+        this.endAt = 40;
+        this.catalogNotes = createCatalog(this);
     }
+}
 
-    public boolean isCatalog() {
-        return this.isCatalog;
+class Cs102 extends Course {
+    public Cs102() {
+        super("CS 102");
+        this.isCatalog = false;
+        this.exams = new String[]{"Midterm", "Lab", "Project", "Homework and Quiz", "Final"};
+        this.notes = new double[5];
+        this.weights = new double[] {25, 15, 25, 10, 25};
+        this.length = 5;
+        this.startFrom = 90;
+        this.endAt = 30;
+        this.catalogNotes = createCatalog(this); 
+    }
+}
+
+class Phys102 extends Course {
+    public Phys102() {
+        super("PHYS 102");
+        this.isCatalog = true;
+        this.exams = new String[]{"Midterm 1", "Midterm 2", "Lab", "Homework", "Quiz", "Final"};
+        this.notes = new double[6];
+        this.weights = new double[] {20, 20, 20, 10, 10, 20};
+        this.catalogNotes = new int[] {85, 80, 75, 70, 65, 60, 55, 50, 45, 40};
+        this.length = 6;
+    }
+}
+
+class Ee102 extends Course {
+    public Ee102() {
+        super("EE 102");
+        this.isCatalog = false;
+        this.exams = new String[]{"Midterm", "Lab", "Project", "Attendance", "Final"};
+        this.notes = new double[5];
+        this.weights = new double[] {30, 14, 16, 5, 35};
+        this.length = 5;
+        this.startFrom = 85;
+        this.endAt = 40;
+        this.catalogNotes = createCatalog(this); 
     }
 }
