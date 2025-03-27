@@ -121,12 +121,11 @@ public class GradeCalculator extends JFrame {
         calcButton.setPreferredSize(new Dimension(200, 50)); 
         calcButton.addActionListener(_ -> {
             for (int i = 0; i < course.length; i ++) {
-                if (isDouble(textFields[i].getText()))grades[i] = Double.parseDouble(textFields[i].getText());
+                if (isDouble(textFields[i].getText()))grades[i] = Math.min(100,Double.parseDouble(textFields[i].getText()));
                 else grades[i] = 0.0;
             }
             course.notes = grades;
             double average = course.calculateAverage(grades);
-            String letterGrade = course.getLetterGrade(average);
             if (grades[course.length - 1] == 0) neededGradeTable(course, average);
             else gradeMessage(course, average);
             
@@ -192,11 +191,12 @@ public class GradeCalculator extends JFrame {
     
         JPanel titlePanel = new JPanel(new GridLayout(1, 2));
         JLabel lbl1 = new JLabel("Letter Grade", SwingConstants.CENTER);
+        if (!course.isCatalog) lbl1.setText("Average");
         JLabel lbl2 = new JLabel("Needed Final", SwingConstants.CENTER);
         titlePanel.add(lbl1);
         titlePanel.add(lbl2);
     
-        int iterations = Math.min(course.letterGrades.length, course.catalogNotes.length);
+        int iterations = Math.min(course.letterGrades.length - 1, course.catalogNotes.length);
         int validCount = 0;
         for (int i = 0; i < iterations; i++) {
             double neededGrade = Math.ceil(course.calculateRequiredFinal(course.catalogNotes[i]));

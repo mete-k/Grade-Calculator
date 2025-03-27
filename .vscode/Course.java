@@ -1,8 +1,4 @@
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.util.ArrayList;
-
-import javax.swing.JPanel;
 
 public class Course {
     public String[] letterGrades = {"A ", "A-", "B+", "B ", "C+", "C ", "C-", "D+", "D ", "F "};
@@ -60,9 +56,6 @@ public class Course {
             returnArr[i] = a1.get(i);
         }
         return returnArr;
-    }
-    
-    private void curveCourse() {
     }
 }
 class Math102 extends Course {
