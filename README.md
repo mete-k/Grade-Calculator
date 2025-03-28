@@ -33,4 +33,5 @@ A Java Swing-based desktop application that helps university students manage and
 
 ## Possible Improvements
 - Add a GPA calculator
+- Add more courses (ENG 102, TURK 102...)
 
