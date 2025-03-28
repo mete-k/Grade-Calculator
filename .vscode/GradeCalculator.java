@@ -1,4 +1,10 @@
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.*;
@@ -27,37 +33,45 @@ public class GradeCalculator extends JFrame {
     }
 
     public Course courseSelectionMenu() {
-        this.getContentPane().removeAll();
-        this.setLayout(new BorderLayout());
+        resetFrame();
     
         JLabel label = new JLabel("Select a course:", SwingConstants.CENTER);
         label.setFont(new Font("Arial", Font.PLAIN, 30));
         this.add(label, BorderLayout.NORTH);
     
         JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setLayout(new GridLayout(3,2,20,20));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
     
         ArrayList<JRadioButton> radioButtons = new ArrayList<>();
         ButtonGroup group = new ButtonGroup();
     
         for (Course course : courses) {
+            JPanel cellPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
             JRadioButton rb = new JRadioButton(course.courseName);
+            rb.setHorizontalAlignment(SwingConstants.CENTER);
             rb.setFont(new Font("Arial", Font.BOLD, 20));
             group.add(rb);
             radioButtons.add(rb);
-            centerPanel.add(rb);
-            centerPanel.add(Box.createVerticalStrut(10));
+            cellPanel.add(rb);
+            centerPanel.add(cellPanel);
         }
     
         this.add(centerPanel, BorderLayout.CENTER);
     
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+
         JButton continueButton = new JButton("Continue");
         continueButton.setEnabled(false);
         continueButton.setFont(new Font("Arial", Font.ROMAN_BASELINE, 17));
         continueButton.setPreferredSize(new Dimension(120, 40));
+
+        JButton userButton = new JButton("Saved");
+        userButton.setFont(new Font("Arial", Font.ROMAN_BASELINE, 17));
+        userButton.setPreferredSize(new Dimension(120, 40));
+
         bottomPanel.add(continueButton);
+        bottomPanel.add(userButton);
         this.add(bottomPanel, BorderLayout.SOUTH);
     
         for (JRadioButton rb : radioButtons) {
@@ -71,9 +85,15 @@ public class GradeCalculator extends JFrame {
                     break;
                 }
             }
-            calculationPanel(selected); 
+            int[] arr = new int[selected.length];
+            calculationPanel(selected,arr); 
         });
-    
+
+        userButton.addActionListener(_ -> {
+            String studentName = JOptionPane.showInputDialog(null, "Enter your name:");
+            getGrades(studentName);
+        });
+
         this.revalidate();
         this.repaint();
     
@@ -87,11 +107,11 @@ public class GradeCalculator extends JFrame {
         courses.add(new Cs102());
         courses.add(new Phys102());
         courses.add(new Ee102());
+        courses.add(new Econ108());
     }
 
-    public void calculationPanel(Course course) {
-        this.getContentPane().removeAll();
-        this.setLayout(new BorderLayout());
+    public void calculationPanel(Course course, int[] arr) {
+        resetFrame();
     
         JLabel title = new JLabel(course.courseName, SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 25));
@@ -109,9 +129,7 @@ public class GradeCalculator extends JFrame {
             label.setFont(new Font("Arial", Font.BOLD, 20));
             fieldsPanel.add(label);
     
-            JTextField field = new JTextField();
-            textFields[i] = field;
-            fieldsPanel.add(field);
+            setGradeAreas(arr[i], i, fieldsPanel, textFields);
         }
         centerPanel.add(fieldsPanel);
     
@@ -121,7 +139,7 @@ public class GradeCalculator extends JFrame {
         calcButton.setPreferredSize(new Dimension(200, 50)); 
         calcButton.addActionListener(_ -> {
             for (int i = 0; i < course.length; i ++) {
-                if (isDouble(textFields[i].getText()))grades[i] = Math.min(100,Double.parseDouble(textFields[i].getText()));
+                if (isDouble(textFields[i].getText()))grades[i] = Math.min(100, Double.parseDouble(textFields[i].getText()));
                 else grades[i] = 0.0;
             }
             course.notes = grades;
@@ -151,8 +169,30 @@ public class GradeCalculator extends JFrame {
         saveButton.setFont(new Font("Arial", Font.ROMAN_BASELINE, 17));
         saveButton.setPreferredSize(new Dimension(120, 40));
         saveButton.addActionListener(_ -> {
-            System.out.println("TO DO");
+            String studentName = JOptionPane.showInputDialog(null, "Enter your name:");
+            if (studentName == null || studentName.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please enter a valid name.");
+                return;
+            }
+            
+            int[] intGrades = new int[course.length];
+            for (int i = 0; i < course.length; i++) {
+                try {
+                    intGrades[i] = (int) Double.parseDouble(textFields[i].getText());
+                } catch (NumberFormatException ex) {
+                    intGrades[i] = 0; 
+                }
+            }
+            
+            boolean saved = saveToFile(course, studentName, intGrades);
+            
+            if (saved) {
+                JOptionPane.showMessageDialog(null, "Grades saved successfully.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Error saving grades.");
+            }
         });
+
         bottomPanel.add(saveButton);
     
         this.add(bottomPanel, BorderLayout.SOUTH);
@@ -231,17 +271,162 @@ public class GradeCalculator extends JFrame {
         else JOptionPane.showMessageDialog(null, "Your average is " + avg, "Grade", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /*private boolean saveToFile(Course course, String name, int[] grades) {
-        will be implemented later.
-        /* create a txt file for each course (done previously) 
-         * when the user saves their grades, add their name and grades to this file.
-         * the users grades should start with the users name and end with another users name.
-         * to handle the user's name being the last in the file, add a string to the end like "end" or sth idk.
-         * save the grades to an array then add them to this file. 
-         * ust sync the grades array to the txt file if there are any changes. youre going to sync any way no need to waste time iterating
-         * 
-    }*/
+    private boolean saveToFile(Course course, String name, int[] grades) {
 
+        File file = course.file;
+        ArrayList<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error reading file", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if (!lines.isEmpty() && lines.get(lines.size() - 1).equals("end")) {
+            lines.remove(lines.size() - 1);
+        }
+
+        ArrayList<String> newLines = new ArrayList<>();
+        boolean userFound = false;
+        for (int i = 0; i < lines.size(); ) {
+            String currentName = lines.get(i).trim();
+            if (currentName.equals(name)) {
+                userFound = true;
+                newLines.add(name);
+                newLines.add(arrayToString(grades));
+                i += 2; 
+            } else {
+                newLines.add(currentName);
+                if (i + 1 < lines.size()) {
+                    newLines.add(lines.get(i + 1));
+                }
+                i += 2;
+            }
+        }
+
+        if (!userFound) {
+            if (!newLines.isEmpty()) {
+                newLines.add("");
+            }
+            newLines.add(name);
+            newLines.add(arrayToString(grades));
+        }
+
+        newLines.add("end");
+        try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
+            for (String l : newLines) {
+                pw.println(l);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error writing to file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+            
+        return true;
+    }
+
+    private String arrayToString(int[] arr) {
+        String s = "";
+        for (int i = 0; i < arr.length; i++) {
+            s += arr[i];
+            if (i < arr.length - 1) {
+                s += " ";
+            }
+        }
+        return s;
+    }
+
+    private void getGrades(String name) {
+        ArrayList<Course> userCourses = new ArrayList<>();
+        if (!isNameInAnyCourse(name, userCourses)) JOptionPane.showMessageDialog(null,"The name " + name + " is not saved in any courses.", "Error",JOptionPane.ERROR_MESSAGE);
+        int size = userCourses.size();
+        displayUserGrades(name);
+    }
+
+    private boolean isNameInAnyCourse(String name, ArrayList<Course> userCourses) {
+        for (Course course : courses) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(course.file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().equalsIgnoreCase(name)) {
+                        userCourses.add(course);
+                        return true;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    private void displayUserGrades(String userName) {
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+    
+        for (Course course : courses) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(course.file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().equalsIgnoreCase(userName)) {
+                        String gradeLine = reader.readLine();
+                        int[] arr = parseGrades(gradeLine);
+                        JPanel coursePanel = new JPanel(new GridLayout(1,3,10,20));
+                        JLabel courseNameLabel = new JLabel(course.courseName, SwingConstants.CENTER);
+                        JLabel gradesLabel = new JLabel("Grades: " + gradeLine, SwingConstants.CENTER);
+                        JButton editButton = new JButton("Edit");
+                        editButton.addActionListener(e -> {
+                            calculationPanel(course,arr);
+                            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(mainPanel);
+                            if (frame != null) {
+                                frame.dispose();
+                            }
+                        });
+                        coursePanel.add(courseNameLabel);
+                        coursePanel.add(gradesLabel);
+                        coursePanel.add(editButton);
+                        mainPanel.add(coursePanel);
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    
+        JFrame frame = new JFrame("User Grades");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.add(new JScrollPane(mainPanel));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }    
+
+    private void resetFrame()  {
+        this.getContentPane().removeAll();
+        this.setLayout(new BorderLayout());
+    }
+
+    private void setGradeAreas(int grade, int index, JPanel panel, JTextField[] textFields) {
+        JTextField field = new JTextField();
+        if (grade != 0) field.setText(Integer.toString(grade));
+        textFields[index] = field;
+        panel.add(field);
+    }
+
+    private int[] parseGrades(String gradeLine) {
+        String[] parts = gradeLine.trim().split("\\s+");
+        int[] grades = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            int value = Integer.parseInt(parts[i]);
+            grades[i] = Math.min(value, 100);
+        }
+        return grades;
+    }
+    
     public static void main(String[] args) {
         new GradeCalculator();
     }
