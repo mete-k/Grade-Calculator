@@ -198,7 +198,7 @@ class Econ108 extends Course {
     public Econ108() {
         super("ECON 108");
         this.isCatalog = false;
-        this.exams = new String[]{"1st Midterm", "2nd Midterm", "Final", "Quiz"};
+        this.exams = new String[]{"Midterm 1", "Midterm 2", "Final", "Quiz"};
         this.notes = new double[4];
         this.weights = new double[] {25, 25, 30, 20};
         this.length = 4;
