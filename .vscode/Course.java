@@ -2,6 +2,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Represents a generic university course with exams, weights, and grading functionality.
+ */
 public class Course {
     public String[] letterGrades = {"A ", "A-", "B+", "B ", "C+", "C ", "C-", "D+", "D ", "F "};
     protected String courseName;
@@ -15,12 +18,21 @@ public class Course {
     protected int endAt;
     protected File file;
 
+    /**
+     * Constructs a Course object and initializes its corresponding file.
+     * @param courseName the name of the course.
+     */
     public Course(String courseName) {
         this.courseName = courseName;
         this.file = new File(this.courseName);
         createFile(file);
     }  
 
+    /**
+     * Calculates the weighted average of a given grade array.
+     * @param notes the array of grades.
+     * @return the weighted average.
+     */
     public double calculateAverage(double[] notes) {
         double average = 0;
         for (int i = 0; i < notes.length; i++) {
@@ -29,11 +41,21 @@ public class Course {
         return average;
     }
 
+    /**
+     * Calculates the required final exam grade to achieve a desired final grade.
+     * @param wantedNote the target final average.
+     * @return the grade needed on the final exam.
+     */
     public double calculateRequiredFinal(double wantedNote) {
         double noteBeforeFinal = calculateAverage(notes); 
         return (wantedNote - noteBeforeFinal) * 100 / this.weights[this.length - 1];
     }      
 
+    /**
+     * Returns the letter grade based on catalog grade thresholds.
+     * @param average the average grade.
+     * @return the corresponding letter grade.
+     */
     public String getLetterGrade(double average) {
         if (!this.isCatalog) return null;
         for (int i = 0; i < catalogNotes.length; i++) {
@@ -44,6 +66,12 @@ public class Course {
         return letterGrades[letterGrades.length - 1];
     }
 
+    /**
+     * Generates a catalog grading array with intervals.
+     * @param course the course whose catalog is to be generated.
+     * @param i the interval between catalog thresholds.
+     * @return an int array of catalog thresholds.
+     */
     protected int[] createCatalog(Course course, int i) {
         int start = course.startFrom;
         int end = course.endAt;
@@ -55,6 +83,11 @@ public class Course {
         return ArrayListToArray(catalog);
     }
 
+    /**
+     * Converts an ArrayList of Integers to an array of ints.
+     * @param a1 the input ArrayList.
+     * @return the resulting int array.
+     */
     private int[] ArrayListToArray(ArrayList<Integer> a1) {
         int[] returnArr = new int[a1.size()];
         for (int i = 0; i < a1.size(); i++ ) {
@@ -63,6 +96,10 @@ public class Course {
         return returnArr;
     }
 
+    /**
+     * Creates a file for storing user data for the course.
+     * @param file the file to create.
+     */
     private void createFile(File file) {
         try {
             if (file.createNewFile()) System.out.println("File created: " + file.getName());    
@@ -72,8 +109,11 @@ public class Course {
         }
     }
 }
-class Math102 extends Course {
 
+/**
+ * Represents the MATH 102 course with catalog-based grading.
+ */
+class Math102 extends Course {
     public Math102() {
         super("MATH 102");
         this.isCatalog = true;
@@ -85,6 +125,9 @@ class Math102 extends Course {
     }
 }
 
+/**
+ * Represents the MATH 132 course using linear grading without catalog.
+ */
 class Math132 extends Course {
     public Math132() {
         super("MATH 132");
@@ -99,6 +142,9 @@ class Math132 extends Course {
     }
 }
 
+/**
+ * Represents the CS 102 course with custom weights and linear grading.
+ */
 class Cs102 extends Course {
     public Cs102() {
         super("CS 102");
@@ -113,6 +159,9 @@ class Cs102 extends Course {
     }
 }
 
+/**
+ * Represents the PHYS 102 course with catalog-based grading.
+ */
 class Phys102 extends Course {
     public Phys102() {
         super("PHYS 102");
@@ -125,6 +174,9 @@ class Phys102 extends Course {
     }
 }
 
+/**
+ * Represents the EE 102 course with linear grading.
+ */
 class Ee102 extends Course {
     public Ee102() {
         super("EE 102");
@@ -139,11 +191,14 @@ class Ee102 extends Course {
     }
 }
 
+/**
+ * Represents the ECON 108 course with custom weights and linear grading.
+ */
 class Econ108 extends Course {
     public Econ108() {
         super("ECON 108");
         this.isCatalog = false;
-        this.exams = new String[]{"1st Midterm", "2nd Midterm", "Final", "Quiz"};
+        this.exams = new String[]{"Midterm 1", "Midterm 2", "Final", "Quiz"};
         this.notes = new double[4];
         this.weights = new double[] {25, 25, 30, 20};
         this.length = 4;
