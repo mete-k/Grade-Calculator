@@ -1,8 +1,6 @@
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.swing.JPanel;
 
 public class Course {
     public String[] letterGrades = {"A ", "A-", "B+", "B ", "C+", "C ", "C-", "D+", "D ", "F "};
@@ -15,10 +13,13 @@ public class Course {
     protected int length;
     protected int startFrom;
     protected int endAt;
+    protected File file;
 
     public Course(String courseName) {
         this.courseName = courseName;
-    }
+        this.file = new File(this.courseName);
+        createFile(file);
+    }  
 
     public double calculateAverage(double[] notes) {
         double average = 0;
@@ -43,26 +44,32 @@ public class Course {
         return letterGrades[letterGrades.length - 1];
     }
 
-    protected int[] createCatalog(Course course) {
+    protected int[] createCatalog(Course course, int i) {
         int start = course.startFrom;
         int end = course.endAt;
         ArrayList<Integer> catalog = new ArrayList<>();
         while (start > end) {
             catalog.add(start);
-            start -= 5; 
+            start -= i; 
         }
         return ArrayListToArray(catalog);
     }
 
-    public int[] ArrayListToArray(ArrayList<Integer> a1) {
+    private int[] ArrayListToArray(ArrayList<Integer> a1) {
         int[] returnArr = new int[a1.size()];
         for (int i = 0; i < a1.size(); i++ ) {
             returnArr[i] = a1.get(i);
         }
         return returnArr;
     }
-    
-    private void curveCourse() {
+
+    private void createFile(File file) {
+        try {
+            if (file.createNewFile()) System.out.println("File created: " + file.getName());    
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 }
 class Math102 extends Course {
@@ -88,7 +95,7 @@ class Math132 extends Course {
         this.length = 3;
         this.startFrom = 80;
         this.endAt = 40;
-        this.catalogNotes = createCatalog(this);
+        this.catalogNotes = createCatalog(this,5);
     }
 }
 
@@ -102,7 +109,7 @@ class Cs102 extends Course {
         this.length = 5;
         this.startFrom = 90;
         this.endAt = 30;
-        this.catalogNotes = createCatalog(this); 
+        this.catalogNotes = createCatalog(this,5); 
     }
 }
 
@@ -128,6 +135,20 @@ class Ee102 extends Course {
         this.length = 5;
         this.startFrom = 85;
         this.endAt = 40;
-        this.catalogNotes = createCatalog(this); 
+        this.catalogNotes = createCatalog(this,5); 
+    }
+}
+
+class Econ108 extends Course {
+    public Econ108() {
+        super("ECON 108");
+        this.isCatalog = false;
+        this.exams = new String[]{"1st Midterm", "2nd Midterm", "Final", "Quiz"};
+        this.notes = new double[4];
+        this.weights = new double[] {25, 25, 30, 20};
+        this.length = 4;
+        this.startFrom = 85;
+        this.endAt = 40;
+        this.catalogNotes = createCatalog(this,5); 
     }
 }
