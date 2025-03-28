@@ -28,7 +28,7 @@ A Java Swing-based desktop application that helps university students manage and
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/grade-calculator.git
+   git clone https://github.com/elfbzkrtt07/grade-calculator.git
    cd grade-calculator
 
 ## Possible Improvements
