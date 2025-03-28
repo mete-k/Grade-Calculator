@@ -4,7 +4,7 @@ A Java Swing-based desktop application that helps university students manage and
 
 ---
 
-## 🚀 Features
+## Features
 
 - Select from multiple predefined courses (e.g., MATH 102, PHYS 102, CS 102)
 - Weighted average grade calculation
@@ -16,18 +16,21 @@ A Java Swing-based desktop application that helps university students manage and
 
 ---
 
-## 📂 Structure
+## Structure
 
 - `Course.java`: Abstract class with subclasses for each course (e.g., `Math102`, `Cs102`, etc.)
 - `GradeCalculator.java`: Main GUI application handling all user interactions and grade logic
 
 ---
 
-## 🛠️ Setup & Run
+## Setup & Run
 
 1. **Clone the repository:**
 
    ```bash
    git clone https://github.com/yourusername/grade-calculator.git
    cd grade-calculator
+
+## Possible Improvements
+- Add a GPA calculator
 
