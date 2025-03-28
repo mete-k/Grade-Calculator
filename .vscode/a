@@ -1,8 +1,0 @@
-    private void setGradeFields(int[] grades, JPanel panel, JTextField[] textFields) {
-        for (int i : grades) {
-            JTextField field = new JTextField(i);
-            if (i != 0) field.setText(Integer.toString(i));
-            textFields[i] = field;
-            panel.add(field);
-        }
-    }
