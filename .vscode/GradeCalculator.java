@@ -9,6 +9,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.*;
 
+/**
+ * GradeCalculator is a GUI-based Java application for managing and calculating grades for various university courses.
+ * It allows students to enter, save, and edit grades; calculate averages; and view required final grades.
+ */
 public class GradeCalculator extends JFrame {
     private ArrayList<Course> courses;
     private Course selected = null;
@@ -16,6 +20,9 @@ public class GradeCalculator extends JFrame {
     private JPanel calculationPanel;
     private ArrayList<String> users;
 
+    /**
+     * Constructs the main GradeCalculator frame and initializes all UI components.
+     */
     public GradeCalculator() {
         this.setSize(800, 600); 
         this.setTitle("Grade Calculator App");
@@ -32,6 +39,10 @@ public class GradeCalculator extends JFrame {
         this.setVisible(true);
     }
 
+    /**
+     * Displays the main menu for course selection.
+     * @return the selected course.
+     */
     public Course courseSelectionMenu() {
         resetFrame();
     
@@ -100,6 +111,9 @@ public class GradeCalculator extends JFrame {
         return selected;
     }
 
+    /**
+     * Initializes the available courses.
+     */
     public void initializeCourses() {
         courses = new ArrayList<>();
         courses.add(new Math102());
@@ -110,6 +124,11 @@ public class GradeCalculator extends JFrame {
         courses.add(new Econ108());
     }
 
+    /**
+     * Displays the grade input and calculation panel for a specific course.
+     * @param course The selected course.
+     * @param arr Pre-filled grades (if any).
+     */
     public void calculationPanel(Course course, int[] arr) {
         resetFrame();
     
@@ -201,6 +220,11 @@ public class GradeCalculator extends JFrame {
         this.repaint();
     }
 
+    /**
+     * Finds a course object by name.
+     * @param name The name of the course.
+     * @return The matching Course object or null if not found.
+     */
     private Course getCourseByName(String name) {
         for (Course c : courses) {
             if (c.courseName.equals(name)) return c;
@@ -208,6 +232,11 @@ public class GradeCalculator extends JFrame {
         return null;
     }
 
+    /**
+     * Checks if a string is a valid double.
+     * @param s The string to check.
+     * @return true if it's a double, false otherwise.
+     */
     private boolean isDouble(String s) {
         if (s == null || s.trim().isEmpty()) {
             return false;
@@ -219,7 +248,12 @@ public class GradeCalculator extends JFrame {
             return false;
         }
     }
-    
+
+    /**
+     * Displays a table showing required final exam grades for various averages.
+     * @param course The course to calculate for.
+     * @param average The current average.
+     */
     private void neededGradeTable(Course course, double average) {
         JFrame frame = new JFrame();
         frame.setSize(300, 400); 
@@ -263,7 +297,11 @@ public class GradeCalculator extends JFrame {
         frame.setVisible(true);
     }
     
-
+    /**
+     * Shows a message dialog with the calculated average and optional letter grade.
+     * @param course The course.
+     * @param average The computed average.
+     */
     private void gradeMessage (Course course, double average) {
         DecimalFormat df = new DecimalFormat("#.00");
         String avg = df.format(average);
@@ -271,8 +309,14 @@ public class GradeCalculator extends JFrame {
         else JOptionPane.showMessageDialog(null, "Your average is " + avg, "Grade", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Saves student grades to a file.
+     * @param course The course.
+     * @param name The student name.
+     * @param grades The grades.
+     * @return true if successful, false otherwise.
+     */
     private boolean saveToFile(Course course, String name, int[] grades) {
-
         File file = course.file;
         ArrayList<String> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -328,6 +372,11 @@ public class GradeCalculator extends JFrame {
         return true;
     }
 
+    /**
+     * Converts an int array to a space-separated string.
+     * @param arr The array.
+     * @return The resulting string.
+     */
     private String arrayToString(int[] arr) {
         String s = "";
         for (int i = 0; i < arr.length; i++) {
@@ -339,6 +388,10 @@ public class GradeCalculator extends JFrame {
         return s;
     }
 
+    /**
+     * Retrieves and displays saved grades for a specific user.
+     * @param name The user's name.
+     */
     private void getGrades(String name) {
         ArrayList<Course> userCourses = new ArrayList<>();
         if (!isNameInAnyCourse(name, userCourses)) JOptionPane.showMessageDialog(null,"The name " + name + " is not saved in any courses.", "Error",JOptionPane.ERROR_MESSAGE);
@@ -346,6 +399,12 @@ public class GradeCalculator extends JFrame {
         displayUserGrades(name);
     }
 
+    /**
+     * Checks whether a name exists in any course file.
+     * @param name The name.
+     * @param userCourses Output list of matching courses.
+     * @return true if found, false otherwise.
+     */
     private boolean isNameInAnyCourse(String name, ArrayList<Course> userCourses) {
         for (Course course : courses) {
             try (BufferedReader reader = new BufferedReader(new FileReader(course.file))) {
@@ -363,6 +422,10 @@ public class GradeCalculator extends JFrame {
         return false;
     }
 
+    /**
+     * Displays all saved grades of a user.
+     * @param userName The user's name.
+     */
     private void displayUserGrades(String userName) {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -405,11 +468,21 @@ public class GradeCalculator extends JFrame {
         frame.setVisible(true);
     }    
 
+    /**
+     * Resets the frame for a new view.
+     */
     private void resetFrame()  {
         this.getContentPane().removeAll();
         this.setLayout(new BorderLayout());
     }
 
+    /**
+     * Sets up the grade input field.
+     * @param grade Preloaded grade.
+     * @param index Index of the exam.
+     * @param panel The UI panel.
+     * @param textFields Grade input fields array.
+     */
     private void setGradeAreas(int grade, int index, JPanel panel, JTextField[] textFields) {
         JTextField field = new JTextField();
         if (grade != 0) field.setText(Integer.toString(grade));
@@ -417,6 +490,11 @@ public class GradeCalculator extends JFrame {
         panel.add(field);
     }
 
+    /**
+     * Parses grades from a space-separated string.
+     * @param gradeLine Grade string.
+     * @return Parsed int array.
+     */
     private int[] parseGrades(String gradeLine) {
         String[] parts = gradeLine.trim().split("\\s+");
         int[] grades = new int[parts.length];
@@ -426,7 +504,11 @@ public class GradeCalculator extends JFrame {
         }
         return grades;
     }
-    
+
+    /**
+     * Main method to launch the application.
+     * @param args Command-line arguments.
+     */
     public static void main(String[] args) {
         new GradeCalculator();
     }
