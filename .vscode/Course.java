@@ -1,21 +1,19 @@
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Represents a generic university course with exams, weights, and grading functionality.
  */
 public class Course {
-    public String[] letterGrades = {"A ", "A-", "B+", "B ", "C+", "C ", "C-", "D+", "D ", "F "};
+    public static final String[] letterGrades = {"A ", "A-", "B+", "B ", "C+", "C ", "C-", "D+", "D ", "F "};
     protected String courseName;
+
     protected double[] notes;
     protected double[] weights;
     protected String[] exams;
+
     protected boolean isCatalog;
     protected int[] catalogNotes;
-    protected int length;
-    protected int startFrom;
-    protected int endAt;
     protected File file;
 
     /**
@@ -34,10 +32,14 @@ public class Course {
      * @return the weighted average.
      */
     public double calculateAverage(double[] notes) {
+
         double average = 0;
         for (int i = 0; i < notes.length; i++) {
-            average += notes[i] * this.weights[i] / 100;
+            average += notes[i] * this.weights[i];
         }
+
+        average /= 100;
+
         return average;
     }
 
@@ -48,7 +50,7 @@ public class Course {
      */
     public double calculateRequiredFinal(double wantedNote) {
         double noteBeforeFinal = calculateAverage(notes); 
-        return (wantedNote - noteBeforeFinal) * 100 / this.weights[this.length - 1];
+        return (wantedNote - noteBeforeFinal) * 100 / this.weights[this.weights.length - 1];
     }      
 
     /**
@@ -72,28 +74,16 @@ public class Course {
      * @param i the interval between catalog thresholds.
      * @return an int array of catalog thresholds.
      */
-    protected int[] createCatalog(Course course, int i) {
-        int start = course.startFrom;
-        int end = course.endAt;
-        ArrayList<Integer> catalog = new ArrayList<>();
-        while (start > end) {
-            catalog.add(start);
-            start -= i; 
-        }
-        return ArrayListToArray(catalog);
-    }
+    protected final int[] createCatalog(int start, int end, int i) {
 
-    /**
-     * Converts an ArrayList of Integers to an array of ints.
-     * @param a1 the input ArrayList.
-     * @return the resulting int array.
-     */
-    private int[] ArrayListToArray(ArrayList<Integer> a1) {
-        int[] returnArr = new int[a1.size()];
-        for (int i = 0; i < a1.size(); i++ ) {
-            returnArr[i] = a1.get(i);
+        int[] catalog = new int[(start - end) / i + 1];
+
+        catalog[0] = start;
+        for (int j = 1; j < catalog.length; j++) {
+            catalog[j] = catalog[j - 1] - i;
         }
-        return returnArr;
+        
+        return catalog;
     }
 
     /**
@@ -120,8 +110,7 @@ class Math102 extends Course {
         this.notes = new double[5];
         this.exams = new String[] {"Midterm 1", "Midterm 2", "Homework", "Quiz", "Final"};
         this.weights = new double[] {80/3.0, 80/3.0, 10, 10, 80/3.0}; 
-        this.catalogNotes = new int[] {80, 75, 70, 65, 60, 55, 50, 45, 40, 30};
-        this.length = 5;
+        this.catalogNotes = createCatalog(80, 30, 5);
     }
 }
 
@@ -135,10 +124,7 @@ class Math132 extends Course {
         this.exams = new String[]{"Midterm 1", "Midterm 2", "Final"};
         this.notes = new double[3];
         this.weights = new double[] {33, 33, 34};
-        this.length = 3;
-        this.startFrom = 80;
-        this.endAt = 40;
-        this.catalogNotes = createCatalog(this,5);
+        this.catalogNotes = createCatalog(80, 40, 5);
     }
 }
 
@@ -152,10 +138,7 @@ class Cs102 extends Course {
         this.exams = new String[]{"Midterm", "Lab", "Project", "Homework and Quiz", "Final"};
         this.notes = new double[5];
         this.weights = new double[] {25, 15, 25, 10, 25};
-        this.length = 5;
-        this.startFrom = 90;
-        this.endAt = 30;
-        this.catalogNotes = createCatalog(this,5); 
+        this.catalogNotes = createCatalog(90, 30, 5); 
     }
 }
 
@@ -169,8 +152,7 @@ class Phys102 extends Course {
         this.exams = new String[]{"Midterm 1", "Midterm 2", "Lab", "Homework", "Quiz", "Final"};
         this.notes = new double[6];
         this.weights = new double[] {20, 20, 20, 10, 10, 20};
-        this.catalogNotes = new int[] {85, 80, 75, 70, 65, 60, 55, 50, 45, 40};
-        this.length = 6;
+        this.catalogNotes = createCatalog(85, 40, 5);
     }
 }
 
@@ -184,10 +166,7 @@ class Ee102 extends Course {
         this.exams = new String[]{"Midterm", "Lab", "Project", "Attendance", "Final"};
         this.notes = new double[5];
         this.weights = new double[] {30, 14, 16, 5, 35};
-        this.length = 5;
-        this.startFrom = 85;
-        this.endAt = 40;
-        this.catalogNotes = createCatalog(this,5); 
+        this.catalogNotes = createCatalog(85, 40, 5); 
     }
 }
 
@@ -198,12 +177,9 @@ class Econ108 extends Course {
     public Econ108() {
         super("ECON 108");
         this.isCatalog = false;
-        this.exams = new String[]{"Midterm 1", "Midterm 2", "Final", "Quiz"};
+        this.exams = new String[] {"Midterm 1", "Midterm 2", "Final", "Quiz"};
         this.notes = new double[4];
         this.weights = new double[] {25, 25, 30, 20};
-        this.length = 4;
-        this.startFrom = 85;
-        this.endAt = 40;
-        this.catalogNotes = createCatalog(this,5); 
+        this.catalogNotes = createCatalog(85, 40, 5); 
     }
 }

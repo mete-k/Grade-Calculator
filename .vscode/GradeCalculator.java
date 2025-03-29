@@ -96,7 +96,7 @@ public class GradeCalculator extends JFrame {
                     break;
                 }
             }
-            int[] arr = new int[selected.length];
+            int[] arr = new int[selected.exams.length];
             calculationPanel(selected,arr); 
         });
 
@@ -138,12 +138,14 @@ public class GradeCalculator extends JFrame {
     
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50)); 
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        int len = course.exams.length;
     
-        double[] grades = new double[course.length];
-        JTextField[] textFields = new JTextField[course.length];
-        JPanel fieldsPanel = new JPanel(new GridLayout(course.length, 2, 10, 10));
-        for (int i = 0; i < course.length; i++) {
+        double[] grades = new double[len];
+        JTextField[] textFields = new JTextField[len];
+        JPanel fieldsPanel = new JPanel(new GridLayout(len, 2, 10, 10));
+        for (int i = 0; i < len; i++) {
             JLabel label = new JLabel(course.exams[i], SwingConstants.CENTER);
             label.setFont(new Font("Arial", Font.BOLD, 20));
             fieldsPanel.add(label);
@@ -157,13 +159,13 @@ public class GradeCalculator extends JFrame {
         calcButton.setFont(new Font("Arial", Font.ROMAN_BASELINE, 17));
         calcButton.setPreferredSize(new Dimension(200, 50)); 
         calcButton.addActionListener(_ -> {
-            for (int i = 0; i < course.length; i ++) {
+            for (int i = 0; i < len; i ++) {
                 if (isDouble(textFields[i].getText()))grades[i] = Math.min(100, Double.parseDouble(textFields[i].getText()));
                 else grades[i] = 0.0;
             }
             course.notes = grades;
             double average = course.calculateAverage(grades);
-            if (grades[course.length - 1] == 0) neededGradeTable(course, average);
+            if (grades[len - 1] == 0) neededGradeTable(course, average);
             else gradeMessage(course, average);
             
         });
@@ -194,8 +196,8 @@ public class GradeCalculator extends JFrame {
                 return;
             }
             
-            int[] intGrades = new int[course.length];
-            for (int i = 0; i < course.length; i++) {
+            int[] intGrades = new int[len];
+            for (int i = 0; i < len; i++) {
                 try {
                     intGrades[i] = (int) Double.parseDouble(textFields[i].getText());
                 } catch (NumberFormatException ex) {
